@@ -5,6 +5,8 @@
 #include <queue>
 #include <mutex>
 #include <unordered_map>
+#include <fstream>
+#include <string>
 
 #include "computePi.hpp"
 #include "safeQueue.hpp"
@@ -12,8 +14,7 @@
 
 #define NUMBER_OF_DIGITS 1000
 
-
-void threadWorker(std::uint16_t threadNum, SafeQueue &piQueue, SafeMap &piMap) {
+void threadWorker(SafeQueue &piQueue, SafeMap &piMap) {
     while(piQueue.isEmpty() == false){
         unsigned int task = piQueue.pop();
         std::cout << ".";
@@ -23,45 +24,70 @@ void threadWorker(std::uint16_t threadNum, SafeQueue &piQueue, SafeMap &piMap) {
     }
 }
 
-void showq(std::queue <int> q){
-    std::queue <int> g = q;
-    while(!g.empty()){
-        std::cout << '\t' << g.front();
-        g.pop();
-    }
-    std::cout << "\n";
-}
-
 void populateQueue(SafeQueue &piQueue){
     for(unsigned int i = 1; i <= NUMBER_OF_DIGITS; i++){
         piQueue.push(i);
     }
 }
 
+void printPi(SafeMap &piMap){
+    std::cout << "\n\n" << NUMBER_OF_DIGITS << " digits of pi\n\n";
+    std::cout << "3.";
+    for(unsigned int i = 1; i <= piMap.getSize(); i++){
+        std::cout << piMap.get(i);
+    }
+    std::cout << "\n\n";
+}
+
+void prettyPi(SafeMap &piMap){
+    std::vector<std::string> colors = {"\033[1;31m", "\033[1;33m", "\033[1;32m", "\033[1;34m", "\033[1;35m"};
+    std::cout << "Pi in the shape of pi\n\n";
+    std::ifstream infile("../pi.txt");
+    std::string line;
+    int index = -1;
+    int lineCount = 0;
+    while(infile >> line){
+        int color = lineCount % colors.size();
+        std::cout << colors[color];
+        for(int i = 0; i < line.length(); i++){
+            if (line[i] == '0'){
+                std::cout << " ";
+            }
+            else{
+                if(index == -1){
+                    std::cout << "3";
+                }
+                else if (index == 0){
+                    std::cout << ".";
+                }
+                else{
+                    std::cout << piMap.get(index);
+                }
+                index++;
+            }
+        }
+        std::cout << "\n";
+        lineCount++;
+    }
+    infile.close();
+    std::cout << "\n";
+}
+
 
 int main() {
     SafeQueue piQueue;
     populateQueue(piQueue);
-
     SafeMap piMap;
 
-    //
-    // Make as many threads as there are CPU cores
-    // Assign them to run our threadWorker function, and supply arguments as necessary for that function
     std::vector<std::shared_ptr<std::thread>> threads;
-    for (std::uint16_t core = 0; core < std::thread::hardware_concurrency(); core++)
-        // The arguments you wish to pass to threadWorker are passed as
-        // arguments to the constructor of std::thread
-        threads.push_back(std::make_shared<std::thread>(threadWorker, core, std::ref(piQueue), std::ref(piMap)));
+    for (std::uint16_t core = 0; core < std::thread::hardware_concurrency(); core++){
+        threads.push_back(std::make_shared<std::thread>(threadWorker, std::ref(piQueue), std::ref(piMap)));
+    }
 
-    //
-    // Wait for all of these threads to complete
     for (auto&& thread : threads)
         thread->join();
 
-    for(int i = 1; i <= piMap.getSize(); i++){
-        std::cout << piMap.get(i);
-    }
-
+    printPi(piMap);
+    prettyPi(piMap);
     return 0;
 }
