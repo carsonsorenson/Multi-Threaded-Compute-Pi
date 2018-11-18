@@ -31,17 +31,16 @@ void populateQueue(SafeQueue &piQueue){
 }
 
 void printPi(SafeMap &piMap){
-    std::cout << "\n\n" << NUMBER_OF_DIGITS << " digits of pi\n\n";
+    std::cout << "\n\n";
     std::cout << "3.";
     for(unsigned int i = 1; i <= piMap.getSize(); i++){
         std::cout << piMap.get(i);
     }
-    std::cout << "\n\n";
 }
 
 void prettyPi(SafeMap &piMap){
     std::vector<std::string> colors = {"\033[1;31m", "\033[1;33m", "\033[1;32m", "\033[1;34m", "\033[1;35m"};
-    std::cout << "Pi in the shape of pi\n\n";
+    std::cout << "\n\n";
     std::ifstream infile("../pi.txt");
     std::string line;
     int index = -1;
@@ -49,7 +48,7 @@ void prettyPi(SafeMap &piMap){
     while(infile >> line){
         int color = lineCount % colors.size();
         std::cout << colors[color];
-        for(int i = 0; i < line.length(); i++){
+        for(unsigned int i = 0; i < line.length(); i++){
             if (line[i] == '0'){
                 std::cout << " ";
             }

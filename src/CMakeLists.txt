@@ -13,6 +13,4 @@ add_executable(ComputePi
     safeQueue.hpp
     safeMap.cpp
     safeMap.hpp
-
-    # Add files implementing your thread-safe data structures below
 )
