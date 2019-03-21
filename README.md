@@ -3,10 +3,10 @@
 To run: go into the src directory, you must have CMake and make installed.
 
 In src directory, run these commands:
-`mkdir build`
-`cmake ..`
-`make`
-`./ComputePi`
+* `mkdir build`
+* `cmake ..`
+* `make`
+* `./ComputePi`
 
 Example of output:
 
